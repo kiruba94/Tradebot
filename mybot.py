@@ -31,16 +31,13 @@ async def stocks(update:Update, context:ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
 
 async def stockdetails(update:Update, context:ContextTypes.DEFAULT_TYPE):
-    if context.args.count<1:
-        message = "No such stock found, try the /stocks command to get the list of scrips available!"
-        await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
-        return
-    stocksymbol = context.args[0]
-    stockdetails = gsheetsapi.get_stock_details(str(stocksymbol))
-    message=""
-    if stockdetails.count==0:
-        message = "No such stock found, try the /stocks command to get the list of scrips available!"
-    message = """
+    try:
+        stocksymbol = context.args[0]
+        stockdetails = gsheetsapi.get_stock_details(str(stocksymbol))
+        message=""
+        if stockdetails.count==0:
+            message = "Stock {} found, try the /stocks command to get the list of scrips available!".format(str(stocksymbol))
+        message = """
 SYMBOL:         {}
 DATE OF TIP:    {}
 BUY PRICE:      {}
@@ -48,7 +45,11 @@ TARGETS:        {}/{}/{}
 STOPLOSS:       {}
 LTP:            {}
 P/L(%):         {}""".format(stockdetails[0],stockdetails[1],stockdetails[3],stockdetails[5],stockdetails[6],stockdetails[7],stockdetails[4],stockdetails[8],stockdetails[9])
-    await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+    except:
+        message = "No Stock Name given or invalid stock, try the /stocks command to get the list of scrips available!"
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+
 
 if __name__=='__main__':
     application = ApplicationBuilder().token('6570419673:AAGuLBLh_pEYj1yKuB4BAaYJXsPL81QWftg').build()
