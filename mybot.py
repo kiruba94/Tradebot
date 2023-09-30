@@ -31,6 +31,10 @@ async def stocks(update:Update, context:ContextTypes.DEFAULT_TYPE):
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
 
 async def stockdetails(update:Update, context:ContextTypes.DEFAULT_TYPE):
+    if context.args.count<1:
+        message = "No such stock found, try the /stocks command to get the list of scrips available!"
+        await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
+        return
     stocksymbol = context.args[0]
     stockdetails = gsheetsapi.get_stock_details(str(stocksymbol))
     message=""
