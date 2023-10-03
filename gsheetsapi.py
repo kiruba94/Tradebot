@@ -7,7 +7,9 @@ from google.oauth2.credentials import Credentials
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
-
+import gc
+from memory_profiler import profile
+gc.set_threshold(0)
 # If modifying these scopes, delete the file token.json.
 SCOPES = ['https://www.googleapis.com/auth/spreadsheets.readonly']
 
@@ -38,32 +40,43 @@ def main():
 
     try:
         service = build('sheets', 'v4', credentials=creds)
-
-        # Call the Sheets API
-        global sheet
-        sheet = service.spreadsheets()
+        return service
     except HttpError as err:
-        print(err)
+        return None
 
+@profile
 def get_all_stocks():
-    main()
+    service = main()
+    if service==None:
+        return None
+    sheet= service.spreadsheets()
+    del service
     ret=[]
     result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,range='A2:A').execute()
+    del sheet
+    gc.collect()
     values = result.get('values', [])
     if not values:
         print('no symbols found')
-        return ret
-    
+        return None
+
     for row in values:
         ret.append(row[0])
     return ret
 
+@profile
 def get_stock_details(stock:str):
-    main()
+    service = main()
+    if service==None:
+        return None
+    sheet= service.spreadsheets()
+    del service
     result = sheet.values().get(spreadsheetId=SAMPLE_SPREADSHEET_ID,range='A2:J').execute()
+    del sheet
+    gc.collect()
     values = result.get('values',[])
     if not values:
-        return []
+        return None
     for row in values:
         if (row[0].upper()==stock.upper()):
             return row

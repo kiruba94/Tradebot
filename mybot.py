@@ -13,7 +13,7 @@ async def start(update:Update, context: ContextTypes.DEFAULT_TYPE):
 Basic Commands Avaiable:
 /stocks - lists all the stocks given as tips
 /stock <stockname> - type the nse scrip name after the /stock command to get complete details of the stock tip provided
-ex: /stock ITC    
+ex: /stock ITC
 """
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
 
@@ -26,7 +26,7 @@ async def stocks(update:Update, context:ContextTypes.DEFAULT_TYPE):
     message=""
     index=1
     for stock in allstocks:
-        message=str(index)+'. '+stock
+        message=message+'\n'+str(index)+'. '+stock
         index+=1
     await context.bot.send_message(chat_id=update.effective_chat.id, text=message)
 
@@ -35,7 +35,7 @@ async def stockdetails(update:Update, context:ContextTypes.DEFAULT_TYPE):
         stocksymbol = context.args[0]
         stockdetails = gsheetsapi.get_stock_details(str(stocksymbol))
         message=""
-        if stockdetails.count==0:
+        if stockdetails==None:
             message = "Stock {} found, try the /stocks command to get the list of scrips available!".format(str(stocksymbol))
         message = """
 SYMBOL:         {}
