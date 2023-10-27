@@ -4,6 +4,7 @@ import os.path
 
 from google.auth.transport.requests import Request
 from google.oauth2.credentials import Credentials
+from google.oauth2 import service_account
 from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from googleapiclient.errors import HttpError
@@ -18,33 +19,17 @@ SAMPLE_SPREADSHEET_ID = '17T0_C1qq106np76U2C5xDVb5NaS_PiYEm11gG-AG0HY'
 SAMPLE_RANGE_NAME = 'A1:E3'
 sheet=""
 
-
 def main():
     """Shows basic usage of the Sheets API.
     Prints values from a sample spreadsheet.
     """
-    creds = None
-
-    if os.path.exists('token.json'):
-        creds = Credentials.from_authorized_user_file('token.json', SCOPES)
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_secrets_file(
-                'credentials.json', SCOPES)
-            creds = flow.run_local_server(port=0)
-        # Save the credentials for the next run
-        with open('token.json', 'w') as token:
-            token.write(creds.to_json())
-
+    credentials = service_account.Credentials.from_service_account_file("Credentials.json", scopes=SCOPES)
     try:
-        service = build('sheets', 'v4', credentials=creds)
+        service = build('sheets', 'v4', credentials=credentials)
         return service
     except HttpError as err:
         return None
 
-@profile
 def get_all_stocks():
     service = main()
     if service==None:
@@ -64,7 +49,6 @@ def get_all_stocks():
         ret.append(row[0])
     return ret
 
-@profile
 def get_stock_details(stock:str):
     service = main()
     if service==None:
@@ -84,4 +68,4 @@ def get_stock_details(stock:str):
 
 if __name__ == '__main__':
     main()
-    print(get_stock_details("piind"))
+    print(get_stock_details("piind"))      

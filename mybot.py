@@ -34,9 +34,7 @@ async def stocks(update:Update, context:ContextTypes.DEFAULT_TYPE):
             currentRow=[]
             currentRow.append(InlineKeyboardButton(stock, callback_data=stock))
             i=1
-        
-    if(i != 3):
-        keyboard.append(currentRow)
+    keyboard.append(currentRow)
     reply_markup = InlineKeyboardMarkup(keyboard)
     await update.message.reply_text("Select a stock to view details:", reply_markup=reply_markup)
     return START_ROUTES
